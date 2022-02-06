@@ -28,5 +28,8 @@ module.exports = {
                 .setStyle('DANGER')
                 .setEmoji('❌')
                 .setDisabled(true))
+
+            await interaction.reply({ content: 'Servermanagment gestartet!', components: [row] });
+
 	},
 };
