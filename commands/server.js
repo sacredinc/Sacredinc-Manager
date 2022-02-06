@@ -28,6 +28,5 @@ module.exports = {
                 .setStyle('DANGER')
                 .setEmoji('❌')
                 .setDisabled(true))
-            )
 	},
 };
