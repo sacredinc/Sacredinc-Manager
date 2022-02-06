@@ -20,7 +20,7 @@ module.exports = {
                 .setCustomId('edit')
                 .setLabel('Bearbeiten')
                 .setStyle('SECONDARY')
-                .setDisabled(true)
+                .setDisabled(true))
             .addComponents(
                 new MessageButton()
                 .setCustomId('remove')
