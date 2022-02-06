@@ -22,7 +22,7 @@ for (const file of commandFiles) {
 client.once('ready', () => {
 	console.log('Ready!');
 });
-
+// Execute code when slash-command is called
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 
