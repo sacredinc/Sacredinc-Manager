@@ -46,7 +46,7 @@ module.exports = {
             const serverid = interaction.guild.id;
 
 
-            await interaction.reply(`${servername} (${serverid}) wurde mit dem Kürzel ${serverkuerzel} auf Rang ${serverrang} hinzugefügt.`)
+            await interaction.reply({content: `${servername} (${serverid}) wurde mit dem Kürzel ${serverkuerzel} auf Rang ${serverrang} hinzugefügt.`, ephemeral: true})
 
         }
 
