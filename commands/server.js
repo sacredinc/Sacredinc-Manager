@@ -1,6 +1,16 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton } = require('discord.js');
 const wait = require('util').promisify(setTimeout);
+const mariadb = require('mariadb');
+const {db_ip, db_pw, db_user, db_db} = require('./dbconfig.json')
+
+const pool = mariadb.createPool({
+     host: db_ip, 
+     user: db_user, 
+     password: db_pw,
+     database: db_db,
+     connectionLimit: 5
+});
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -45,8 +55,9 @@ module.exports = {
             const serverrang = interaction.options.getInteger('serverrang');
             const serverid = interaction.guild.id;
 
-
-            await interaction.reply({content: `${servername} (${serverid}) wurde mit dem Kürzel ${serverkuerzel} auf Rang ${serverrang} hinzugefügt.`, ephemeral: true})
+            await interaction.deferReply({ ephemeral: true })
+            this.connector();
+            await interaction.editReply(`${servername} (${serverid}) wurde mit dem Kürzel ${serverkuerzel} auf Rang ${serverrang} hinzugefügt.`)
 
         }
 
@@ -56,6 +67,22 @@ module.exports = {
         }
 
 	},
+    
+    async connector() {
+        let conn;
+        try {
+          conn = await pool.getConnection();
+          const rows = await conn.query("SELECT 1 as val");
+          console.log(rows);
+          const res = await conn.query("SELECT MAX(id) FROM `servers`");
+          console.log(res);
+      
+        } catch (err) {
+          throw err;
+        } finally {
+          if (conn) return conn.end();
+        }
+      }
     
     
 };
