@@ -38,8 +38,5 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 
-
-
-
 // Login to Discord
 client.login(token);
