@@ -11,38 +11,38 @@ module.exports = {
             .setName('add')
             .setDescription('Füge den aktuellen Server in die Datenbank hinzu')
             .addStringOption(option =>
-                option.setName('Servername')
+                option.setName('servername')
                     .setDescription('Der vollständige Name des Servers')
                     .setRequired(true))
             .addStringOption(option =>
-                option.setName('Serverkürzel')
+                option.setName('serverkürzel')
                     .setDescription('Der abgekürzte Name des Servers')
                     .setRequired(true))
             .addIntegerOption(option =>
-                option.setName('Serverrang')
+                option.setName('serverrang')
                     .setDescription('Der Netzwerkrang des Servers')
                     .setRequired(true)
-                    .addChoice('Zentralserver', 0)
-                    .addChoice('Verifizierter Server', 1)
-                    .addChoice('Netzwerkmitglied', 2)
+                    .addChoice('Zentralserver', 99)
+                    .addChoice('Verifizierter Server', 5)
+                    .addChoice('Netzwerkmitglied', 4)
                     .addChoice('Kooperationspartner', 3)
-                    .addChoice('Partner', 4)
-                    .addChoice('Normaler Server', 5)
-                    .addChoice('Gesperrter Server', 99)))
+                    .addChoice('Partner', 2)
+                    .addChoice('Normaler Server', 1)
+                    .addChoice('Gesperrter Server', 0)))
         .addSubcommand(subcommand =>
             subcommand 
             .setName('remove')
             .setDescription('Entferne einen Server aus der Datenbank')
             .addIntegerOption(option =>
-                option.setName('Serverkürzel')
+                option.setName('serverkürzel')
                 .setDescription('Das Serverkürzel des zu entfernenden Servers')
                 .setRequired(true))),
 
 	async execute(interaction) {
         if(interaction.options.getSubcommand() === 'add') {
-            const servername = interaction.options.getString('Servername');
-            const serverkuerzel = interaction.options.getString('Serverkürzel');
-            const serverrang = interaction.options.getInteger('Serverrang');
+            const servername = interaction.options.getString('servername');
+            const serverkuerzel = interaction.options.getString('serverkürzel');
+            const serverrang = interaction.options.getInteger('serverrang');
             const serverid = interaction.guild.id;
 
 
@@ -51,7 +51,7 @@ module.exports = {
         }
 
         else if(interaction.options.getSubcommand() === 'remove') {
-            const serverkürzel = interaction.options.getString('Serverkürzel');
+            const serverkürzel = interaction.options.getString('serverkürzel');
 
         }
 
