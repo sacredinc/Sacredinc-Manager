@@ -84,7 +84,7 @@ module.exports = {
             console.log('\n\n\nend\n\n\n')
           const res = conn.query(`INSERT INTO servers (id, name_long, name_short, server_rank, discord_id) VALUES (0, '${servername}', '${serverkuerzel}', '${serverrang}', '${serverid}');`);
           console.log(res);
-      
+
         } catch (err) {
           throw err;
         } finally {
