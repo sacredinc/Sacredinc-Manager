@@ -1,14 +1,13 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require('discord.js');
-const wait = require('util').promisify(setTimeout);
 const mariadb = require('mariadb');
-const {db_ip, db_pw, db_user, db_db} = require('./dbconfig.json')
+const {db_ip, db_pw, db_user, db_db, db_port} = require('./dbconfig.json')
 
 const pool = mariadb.createPool({
      host: db_ip, 
      user: db_user, 
      password: db_pw,
      database: db_db,
+     port: db_port,
      connectionLimit: 5
 });
 
@@ -56,13 +55,12 @@ module.exports = {
             const serverid = interaction.guild.id;
 
             await interaction.deferReply({ ephemeral: true })
-            this.connector();
+            await this.connector();
             await interaction.editReply(`${servername} (${serverid}) wurde mit dem Kürzel ${serverkuerzel} auf Rang ${serverrang} hinzugefügt.`)
 
         }
 
         else if(interaction.options.getSubcommand() === 'remove') {
-            const serverkürzel = interaction.options.getString('serverkürzel');
 
         }
 
@@ -80,7 +78,7 @@ module.exports = {
         } catch (err) {
           throw err;
         } finally {
-          if (conn) return conn.end();
+          if (conn) await conn.end();
         }
       }
     

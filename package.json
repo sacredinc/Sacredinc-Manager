@@ -1,21 +1,21 @@
 {
-  "name": "user-team-communication-bot",
+  "name": "sacredinc-manager-bot",
   "version": "1.0.0",
-  "description": "A Discord-bot, that allows users to communicate with the serverteam.",
+  "description": "A Discord-bot, that allows the Sacredinc.-staff to access the database.\n",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hfgd123/User-Team-Communication-Bot.git"
+    "url": "git+https://github.com/sacredinc/Sacredinc-Manager.git"
   },
   "author": "hfgd",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hfgd123/User-Team-Communication-Bot/issues"
+    "url": "https://github.com/sacredinc/Sacredinc-Manager/issues"
   },
-  "homepage": "https://github.com/hfgd123/User-Team-Communication-Bot#readme",
+  "homepage": "https://github.com/sacredinc/Sacredinc-Manager#readme",
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
