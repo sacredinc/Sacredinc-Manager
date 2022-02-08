@@ -8,8 +8,14 @@ const pool = mariadb.createPool({
      password: db_pw,
      database: db_db,
      port: db_port,
-     connectionLimit: 5
+     connectionLimit: 5,
+     rowsAsArray: true
 });
+let servername = "";
+let serverkuerzel = "";
+let serverrang = 0;
+let serverid = "";
+
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -49,10 +55,10 @@ module.exports = {
 
 	async execute(interaction) {
         if(interaction.options.getSubcommand() === 'add') {
-            const servername = interaction.options.getString('servername');
-            const serverkuerzel = interaction.options.getString('serverkürzel');
-            const serverrang = interaction.options.getInteger('serverrang');
-            const serverid = interaction.guild.id;
+            servername = interaction.options.getString('servername');
+            serverkuerzel = interaction.options.getString('serverkürzel');
+            serverrang = interaction.options.getInteger('serverrang');
+            serverid = interaction.guild.id;
 
             await interaction.deferReply({ ephemeral: true })
             await this.connector();
@@ -70,9 +76,13 @@ module.exports = {
         let conn;
         try {
           conn = await pool.getConnection();
-          const rows = await conn.query("SELECT 1 as val");
+          const rows = conn.query("SELECT 1 as val");
           console.log(rows);
-          const res = await conn.query("SELECT MAX(id) FROM `servers`");
+          const abc = conn.query('SELECT max(id) from servers');
+          console.log('\n\n\nstart\n\n\n')
+          console.log(abc);
+            console.log('\n\n\nend\n\n\n')
+          const res = conn.query(`INSERT INTO servers (id, name_long, name_short, server_rank, discord_id) VALUES (0, '${servername}', '${serverkuerzel}', '${serverrang}', '${serverid}');`);
           console.log(res);
       
         } catch (err) {
