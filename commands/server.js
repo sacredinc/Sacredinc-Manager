@@ -2,19 +2,11 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const mariadb = require('mariadb');
 const {db_ip, db_pw, db_user, db_db, db_port} = require('./dbconfig.json')
 
-const pool = mariadb.createPool({
-     host: db_ip, 
-     user: db_user, 
-     password: db_pw,
-     database: db_db,
-     port: db_port,
-     connectionLimit: 5,
-     rowsAsArray: true
-});
 let servername = "";
 let serverkuerzel = "";
 let serverrang = 0;
 let serverid = "";
+let idNew = 0;
 
 
 module.exports = {
@@ -61,36 +53,58 @@ module.exports = {
             serverid = interaction.guild.id;
 
             await interaction.deferReply({ ephemeral: true })
-            await this.connector();
-            await interaction.editReply(`${servername} (${serverid}) wurde mit dem Kürzel ${serverkuerzel} auf Rang ${serverrang} hinzugefügt.`)
 
+            let conn;
+
+            try {
+                conn = await mariadb.createConnection({
+                    host: db_ip,
+                    user: db_user,
+                    password: db_pw,
+                    database: db_db,
+                    port: db_port,
+                });
+
+                const rows = await getId(conn);
+
+                for (let i = 0, len = rows.length; i < len; i++) {
+                    idNew = rows[i].id + 1;
+                }
+                await writeServer(conn);
+
+            } catch (err) {
+                console.log(err);
+            } finally {
+                if (conn) conn.close();
+            }
+
+            await interaction.editReply(`${servername} (${serverid}) wurde mit dem Kürzel ${serverkuerzel} auf Rang ${serverrang} hinzugefügt.`)
         }
 
         else if(interaction.options.getSubcommand() === 'remove') {
 
         }
 
-	},
-    
-    async connector() {
-        let conn;
-        try {
-          conn = await pool.getConnection();
-          const rows = conn.query("SELECT 1 as val");
-          console.log(rows);
-          const abc = conn.query('SELECT max(id) from servers');
-          console.log('\n\n\nstart\n\n\n')
-          console.log(abc);
-            console.log('\n\n\nend\n\n\n')
-          const res = conn.query(`INSERT INTO servers (id, name_long, name_short, server_rank, discord_id) VALUES (0, '${servername}', '${serverkuerzel}', '${serverrang}', '${serverid}');`);
-          console.log(res);
-
-        } catch (err) {
-          throw err;
-        } finally {
-          if (conn) await conn.end();
+        function getId(conn) {
+            return conn.query("SELECT id FROM network.servers");
         }
-      }
+
+        function writeServer(conn) {
+            return conn.query(`INSERT INTO servers (id, name_long, name_short, server_rank, discord_id) VALUES ('${idNew}', '${servername}', '${serverkuerzel}', '${serverrang}', '${serverid}');`);
+        }
+
+
+}
     
     
 };
+
+
+/*                    host: db_ip,
+                    user: db_user,
+                    password: db_pw,
+                    database: db_db,
+                    port: db_port,
+                    connectionLimit: 5,
+                    rowsAsArray: true
+ */
