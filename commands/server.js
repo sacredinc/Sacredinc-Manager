@@ -6,7 +6,7 @@ let servername = "";
 let serverkuerzel = "";
 let serverrang = 0;
 let serverid = "";
-let idNew = 0;
+let executor = "";
 
 
 module.exports = {
@@ -46,77 +46,79 @@ module.exports = {
                 .setRequired(true))),
 
 	async execute(interaction) {
+        executor = interaction.member.id.toString();
         if(interaction.options.getSubcommand() === 'set') {
-            servername = interaction.options.getString('servername');
-            serverkuerzel = interaction.options.getString('serverkürzel');
-            serverrang = interaction.options.getInteger('serverrang');
-            serverid = interaction.guild.id;
+                servername = interaction.options.getString('servername');
+                serverkuerzel = interaction.options.getString('serverkürzel');
+                serverrang = interaction.options.getInteger('serverrang');
+                serverid = interaction.guild.id;
 
-            await interaction.deferReply({ ephemeral: true })
+                await interaction.deferReply({ephemeral: true})
 
-            let conn;
+                let conn;
 
-            try {
-                conn = await mariadb.createConnection({
-                    host: db_ip,
-                    user: db_user,
-                    password: db_pw,
-                    database: db_db,
-                    port: db_port,
-                });
+                try {
+                    conn = await mariadb.createConnection({
+                        host: db_ip,
+                        user: db_user,
+                        password: db_pw,
+                        database: db_db,
+                        port: db_port,
+                    });
 
-                await clearServer(conn);
+                    if (checkUserPerms(conn, executor) >= 5) {
 
-                const rows = await getId(conn);
 
-                for (let i = 0, len = rows.length; i < len; i++) {
-                    idNew = rows[i].id + 1;
+                        await clearServer(conn);
+
+                    await writeServer(conn);
+                    await interaction.editReply(`${servername} (${serverid}) wurde mit dem Kürzel ${serverkuerzel} auf Rang ${serverrang} hinzugefügt.`)
+
+                    } else {
+                        await  interaction.editReply("Dazu hast du keine Rechte!")
+                    }
+
+                } catch (err) {
+                    console.log(err);
+                } finally {
+                    if (conn) conn.close();
                 }
-                await writeServer(conn);
-
-            } catch (err) {
-                console.log(err);
-            } finally {
-                if (conn) conn.close();
-            }
-
-            await interaction.editReply(`${servername} (${serverid}) wurde mit dem Kürzel ${serverkuerzel} auf Rang ${serverrang} hinzugefügt.`)
         }
 
         else if(interaction.options.getSubcommand() === 'remove') {
-            serverkuerzel = interaction.options.getString('serverkürzel');
+                serverkuerzel = interaction.options.getString('serverkürzel');
 
-            await interaction.deferReply({ ephemeral: true })
+                await interaction.deferReply({ephemeral: true})
 
-            let conn;
+                let conn;
 
-            try {
-                conn = await mariadb.createConnection({
-                    host: db_ip,
-                    user: db_user,
-                    password: db_pw,
-                    database: db_db,
-                    port: db_port,
-                });
+                try {
+                    conn = await mariadb.createConnection({
+                        host: db_ip,
+                        user: db_user,
+                        password: db_pw,
+                        database: db_db,
+                        port: db_port,
+                    });
 
-                await removeServer(conn);
+                    if (checkUserPerms(conn, executor) >= 5) {
 
-            } catch (err) {
-                console.log(err);
-            } finally {
-                if (conn) conn.close();
-            }
+                        await removeServer(conn);
+                        await interaction.editReply(`Der Server ${serverkuerzel} wurde entfernt.`)
 
-            await interaction.editReply(`Der Server ${serverkuerzel} wurde entfernt.`)
+                    } else {
+                        await  interaction.editReply("Dazu hast du keine Rechte!")
+                    }
 
-        }
-
-        function getId(conn) {
-            return conn.query("SELECT id FROM network.servers");
+                } catch (err) {
+                    console.log(err);
+                } finally {
+                    if (conn) conn.close();
+                }
         }
 
         function writeServer(conn) {
-            return conn.query(`INSERT INTO servers (id, name_long, name_short, server_rank, discord_id) VALUES ('${idNew}', '${servername}', '${serverkuerzel}', '${serverrang}', '${serverid}');`);
+            return conn.query(`INSERT INTO servers (name_long, name_short, server_rank, discord_id) VALUES ('${servername}', '${serverkuerzel}', '${serverrang}', '${serverid}');`);
         }
 
         function clearServer(conn) {
@@ -131,17 +133,8 @@ module.exports = {
             return conn.query(`UPDATE servers SET server_rank = 1 WHERE name_short = '${serverkuerzel}'`);
         }
 
-}
-    
-    
-};
+        function checkUserPerms(conn, executor) {
+            return conn.query(`SELECT user_rank FROM network.users WHERE discord_id='${executor}'`)
+        }
 
-
-/*                    host: db_ip,
-                    user: db_user,
-                    password: db_pw,
-                    database: db_db,
-                    port: db_port,
-                    connectionLimit: 5,
-                    rowsAsArray: true
- */
+}};
